@@ -7,8 +7,6 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface MessageMapper {
 
-    @Mapping(source = "userId", target = "userId")
-    @Mapping(source = "userService", target = "userService")
     @Mapping(source = "itemId", target = "itemId")
     @Mapping(source = "itemService", target = "itemService")
     @Mapping(source = "messageId", target = "messageId")

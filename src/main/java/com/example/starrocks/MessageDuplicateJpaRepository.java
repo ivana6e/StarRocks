@@ -1,12 +1,15 @@
 package com.example.starrocks;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional
 @Repository
 public interface MessageDuplicateJpaRepository extends JpaRepository<MessageDuplicateEntity, Long> {
 
@@ -23,9 +26,21 @@ public interface MessageDuplicateJpaRepository extends JpaRepository<MessageDupl
     List<MessageSelectViewEntity> findByUserIdAndUserService(@Param("userId") String userId, @Param("userService") String userService);
 
     @Query(value = """
-    DELETE FROM message_duplicate
-    WHERE user_id = :userId AND user_service = :userService
-    AND (user_id, user_service, item_id, item_service, message_id) NOT IN :messageList
+    SELECT DISTINCT
+        item_id AS itemId,
+        item_service AS itemService,
+        message_id AS messageId
+    FROM message_duplicate
+    WHERE (item_id, item_service, message_id) NOT IN (
+        SELECT item_id, item_service, max(message_id)
+        FROM message_duplicate
+        GROUP BY item_id, item_service
     )""", nativeQuery = true)
-    void deleteByUserIdAndUserService(@Param("userId") String userId, @Param("userService") String userService, @Param("messageList") List<MessageSelectViewEntity> messageList);
+    List<MessageSelectViewEntity> findShouldBeDeletedMessage();
+
+    @Modifying
+    @Query(value = """
+    DELETE FROM message_duplicate
+    WHERE item_id = :itemId AND item_service = :itemService AND message_id = :messageId""", nativeQuery = true)
+    void deleteByItemIdAndItemServiceAndMessageId(@Param("itemId") Long itemId, @Param("itemService") String itemService, @Param("messageId") Long messageId);
 }

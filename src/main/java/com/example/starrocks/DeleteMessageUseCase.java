@@ -4,20 +4,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DeleteMessageUseCase {
 
     private final MessageDuplicateJpaRepository messageDuplicateJpaRepository;
+    private final MessageMapper messageMapper;
 
-    public void deleteByUserIdAndUserService(String userId, UserService userService) {
-        var messageList = messageDuplicateJpaRepository.findByUserIdAndUserService(userId, userService.name());
+    public void delete() {
+        List<MessageListDto> messageList = messageDuplicateJpaRepository.findShouldBeDeletedMessage()
+                .stream().map(messageMapper::toMessageListDto).toList();
 
-
-
-        log.info("messageList: {}", messageList);
-
-        messageDuplicateJpaRepository.deleteByUserIdAndUserService(userId, userService.name(), messageList);
+        if (!messageList.isEmpty()) {
+            for (MessageListDto message : messageList) {
+                log.info("delete message: {}", message);
+                messageDuplicateJpaRepository.deleteByItemIdAndItemServiceAndMessageId(message.getItemId(), message.getItemService(), message.getMessageId());
+            }
+        }
     }
 }

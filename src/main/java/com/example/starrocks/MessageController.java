@@ -34,13 +34,18 @@ public class MessageController {
         return readMessageUseCase.readAllDuplicate();
     }
 
-    @GetMapping("/read/{userId}/{userService}")
-    public List<MessageSelectViewEntity> readOneUMessage(@PathVariable String userId, @PathVariable UserService userService) {
-        return readMessageUseCase.readByUserIdAndUserService(userId, userService);
+    @GetMapping("/read_primary/{userId}/{userService}")
+    public List<MessagePrimaryEntity> readOneUserMessagePrimary(@PathVariable String userId, @PathVariable UserService userService) {
+        return readMessageUseCase.readByUserIdAndUserServicePrimary(userId, userService);
     }
 
-    @DeleteMapping("/delete/{userId}/{userService}")
-    public void deleteOneMessage(@PathVariable String userId, @PathVariable UserService userService) {
-        deleteMessageUseCase.deleteByUserIdAndUserService(userId, userService);
+    @GetMapping("/read_duplicate/{userId}/{userService}")
+    public List<MessageSelectViewEntity> readOneUserMessageDuplicate(@PathVariable String userId, @PathVariable UserService userService) {
+        return readMessageUseCase.readByUserIdAndUserServiceDuplicate(userId, userService);
+    }
+
+    @DeleteMapping("/delete")
+    public void deleteMessage() {
+        deleteMessageUseCase.delete();
     }
 }

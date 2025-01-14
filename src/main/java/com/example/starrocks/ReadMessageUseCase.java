@@ -22,7 +22,11 @@ public class ReadMessageUseCase {
         return messageDuplicateJpaRepository.findAll();
     }
 
-    public List<MessageSelectViewEntity> readByUserIdAndUserService(String userId, UserService userService) {
+    public List<MessagePrimaryEntity> readByUserIdAndUserServicePrimary(String userId, UserService userService) {
+        return messagePrimaryJpaRepository.findByUserIdAndUserService(userId, userService.name());
+    }
+
+    public List<MessageSelectViewEntity> readByUserIdAndUserServiceDuplicate(String userId, UserService userService) {
         return messageDuplicateJpaRepository.findByUserIdAndUserService(userId, userService.name());
     }
 }
