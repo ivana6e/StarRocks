@@ -1,0 +1,14 @@
+version: '1'
+
+services:
+
+  starrocks_db:
+    image: starrocks/allin1-ubuntu:latest
+    container_name: starrocks_db
+    volumes:
+      - "starrocks:/var/lib/starrocks"
+    ports:
+      - "9030:9030"
+      - "8030:8030"
+volumes:
+  starrocks:
